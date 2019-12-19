@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using WebApplication8.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using WebApplication8.Models;
 
 namespace WebApplication8
 {
@@ -37,7 +38,12 @@ namespace WebApplication8
 
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                    Configuration.GetConnectionString("Sakila")));
+
+            // SEM Added sakilaContext DbContext method to register it as a service 
+            services.AddDbContext<sakilaContext>(options => 
+            options.UseSqlServer(Configuration.GetConnectionString("Sakila")));
+
             services.AddDefaultIdentity<IdentityUser>()
                 .AddDefaultUI(UIFramework.Bootstrap4)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -73,5 +79,16 @@ namespace WebApplication8
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
         }
+
+
+        protected void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer("Server=VOYAGER2;Database=sakila;User ID=dbuser1;password=dbpassw1;Pooling=False;MultipleActiveResultSets=True;Encrypt=False;TrustServerCertificate=True;Trusted_Connection=True");
+            }
+        }
+
+
     }
 }
